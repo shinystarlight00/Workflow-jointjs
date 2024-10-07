@@ -119,16 +119,6 @@ const WFRect = joint.dia.Element.define(
         fontSize: 14,
         fill: "#333333",
       },
-      icon: {
-        text: WFShape_CallIcon,
-        fontFamily: "FontAwesome",
-        fontSize: 15,
-        textWrap: {
-          width: -10,
-        },
-        refX: "5%",
-        refY: "7%",
-      },
     },
   },
   {
@@ -578,8 +568,37 @@ class MyJointJS extends React.Component {
     jsondata.cells.forEach((cell) => {
       // Ensure that rectangles have the correct markup field
       if (cell.type === "workflow.Rectangle" && !cell.markup) {
-        cell.markup =
-          '<g class="rotatable"><g class="scalable"><rect/></g><text/></g>';
+        cell.attr = {
+          body: {
+            refWidth: "100%",
+            refHeight: "100%",
+            strokeWidth: 2,
+            stroke: "#000000",
+            fill: "#FFFFFF",
+          },
+          label: {
+            textVerticalAnchor: "middle",
+            textAnchor: "middle",
+            refX: "50%",
+            refY: "50%",
+            fontSize: 14,
+            fill: "#333333",
+          },
+        };
+        cell.markup = [
+          {
+            tagName: "rect",
+            selector: "body",
+          },
+          {
+            tagName: "text",
+            selector: "label",
+          },
+          {
+            tagName: "text",
+            selector: "icon",
+          },
+        ];
       }
     });
 
