@@ -21,11 +21,7 @@ class LoadDialog extends React.Component {
       title: "",
       selectedValue: "",
       valid: false,
-      list: [
-        { id: 10, title: "Option 1" },
-        { id: 20, title: "Option 2" },
-        { id: 30, title: "Option 3" },
-      ],
+      list: [],
     };
   } // constructor
 
@@ -40,7 +36,7 @@ class LoadDialog extends React.Component {
       .then((response) => response.json())
       .then((data) => {
         if (data.status == "Success") {
-          alert("Workflow data saved successfully!");
+          this.setState({ list: data.data });
         } else {
           alert("Error! ", data.error);
         }
@@ -52,18 +48,16 @@ class LoadDialog extends React.Component {
 
   onSubmit() {
     const formData = new FormData();
-    formData.append("title", this.state.title);
-    formData.append("data", JSON.stringify(this.state.data));
+    formData.append("id", this.state.selectedValue);
 
-    fetch("http://localhost:8050/dtgreen/SysAdmin/AddStep2.php", {
+    fetch("http://localhost:8050/dtgreen/SysAdmin/GetFlow.php", {
       method: "POST",
       body: formData,
     })
       .then((response) => response.json())
       .then((data) => {
         if (data.status == "Success") {
-          alert("Workflow data saved successfully!");
-          this.props.onCancel();
+          this.props.onLoad(data.data);
         } else {
           alert("Error! ", data.error);
         }
