@@ -24,6 +24,7 @@ import WFUtils from "./WFUtils";
 import MessageDialog from "./MessageDialog.js";
 import JointJSUtils from "./JointJSUtils.js";
 import SaveDialog from "./SaveDialog.js";
+import LoadDialog from "./LoadDialog.js";
 
 // https://fontawesome.com/v4.7/icons/
 
@@ -161,11 +162,6 @@ class MyJointJS extends React.Component {
       loadText: "",
       settingsShowDialog: false, // Set to true to show the settings dialog.
       contextShowMenu: false, // Set to true to show the context menu.
-      yamlInputShowDialog: false,
-      yamlOutputShowDialog: false,
-      systemShowMenu: false,
-      aboutDialogOpen: false,
-      yamlText: "",
       mouse: { x: 0, y: 0 },
       menuElement: null,
       anchorEl: null,
@@ -448,6 +444,10 @@ class MyJointJS extends React.Component {
     });
   }
 
+  _loadData() {
+    this.setState({ openLoad: true });
+  }
+
   _menuClose() {
     this.setState({ contextShowMenu: false });
   } // _menuClose
@@ -568,6 +568,10 @@ class MyJointJS extends React.Component {
     // Delete all elements
     const allCells = this.graph.getCells();
     this.graph.removeCells(allCells);
+  }
+
+  _onLoadData(data) {
+    console.log("=========> loaded data ", data);
   }
 
   /**
@@ -736,64 +740,33 @@ class MyJointJS extends React.Component {
             color="primary"
             variant="contained"
             onClick={() => {
-              this._add(true);
+              this._loadData();
             }}
+            style={{ marginRight: 20 }}
           >
-            Add Step
+            Load
           </Button>
-        </Grid>
-
-        <Grid container justifyContent="flex-end">
           <Button
             color="primary"
             variant="contained"
             onClick={() => {
               this._saveData();
             }}
+            style={{ marginRight: 20 }}
           >
             Save
           </Button>
+          <Button
+            color="primary"
+            variant="contained"
+            onClick={() => {
+              this._add(true);
+            }}
+            style={{ marginRight: 20 }}
+          >
+            Add Step
+          </Button>
         </Grid>
-
-        {/* LOAD */}
-        <Dialog open={this.state.openLoad} fullWidth>
-          <p>Load</p>
-          <input
-            type="file"
-            onChange={(event) => {
-              let file = event.target.files[0];
-              const reader = new FileReader();
-              reader.addEventListener("load", (event) => {
-                debugger;
-              });
-              reader.readAsText(file);
-              //debugger;
-            }}
-          ></input>
-          <Input
-            type="text"
-            value={this.state.loadText}
-            multiline
-            rows="12"
-            onChange={(event) => {
-              this.setState({ loadText: event.target.value });
-            }}
-          ></Input>
-          <Button
-            onClick={() => {
-              this.graph.fromJSON(JSON.parse(this.state.loadText));
-            }}
-          >
-            Set JSON
-          </Button>
-          <Button
-            onClick={() => {
-              this.setState({ openLoad: false });
-            }}
-          >
-            Close
-          </Button>
-        </Dialog>
 
         {/* Context Menu from step */}
         <Menu
@@ -828,77 +801,23 @@ class MyJointJS extends React.Component {
           onOk={this._settingsOk.bind(this)}
           onCancel={this._settingsCancel.bind(this)}
         />
-        <YAMLInputDialog
-          open={this.state.yamlInputShowDialog}
-          onOk={(allYaml) => {
-            this.setState({ yamlInputShowDialog: false });
-            this._parseWF(allYaml);
-          }}
-          onCancel={() => {
-            this.setState({ yamlInputShowDialog: false });
-          }}
-        />
-        <YAMLOutputDialog
-          open={this.state.yamlOutputShowDialog}
-          onClose={() => {
-            this.setState({ yamlOutputShowDialog: false });
-          }}
-          text={this.state.yamlText}
-        />
 
-        <Menu
-          id="menu-appbar"
-          anchorEl={this.state.anchorEl}
-          anchorOrigin={{
-            vertical: "top",
-            horizontal: "right",
-          }}
-          MenuListProps={{
-            onMouseLeave: () => this.setState({ systemShowMenu: false }),
-          }}
-          keepMounted
-          transformOrigin={{
-            vertical: "top",
-            horizontal: "right",
-          }}
-          open={this.state.systemShowMenu}
-          onClose={() => {
-            this.setState({ systemShowMenu: false });
-          }}
-        >
-          <MenuItem onClick={this._layout.bind(this)}>Layout</MenuItem>
-          <MenuItem
-            onClick={() => {
-              this.setState({ yamlInputShowDialog: true });
-            }}
-          >
-            Input YAML
-          </MenuItem>
-          <Divider />
-          <MenuItem onClick={() => this.setState({ aboutDialogOpen: true })}>
-            About...
-          </MenuItem>
-        </Menu>
-
-        <MessageDialog
-          open={this.state.aboutDialogOpen}
-          message={
-            <div>
-              <p>Workflow editor</p>
-              <p>Version: 2021-10-30</p>
-              <p>Email: kolban@google.com</p>
-            </div>
-          }
-          title="About ..."
-          onClose={() => this.setState({ aboutDialogOpen: false })}
-        />
-
+        {/* SAVE DIALOG */}
         <SaveDialog
           data={this.state.saveText}
           onCancel={() => {
             this.setState({ openSave: false });
           }}
           open={this.state.openSave}
+        />
+
+        {/* LOAD DIALOG */}
+        <LoadDialog
+          open={this.state.openLoad}
+          onLoad={this.onLoadData.bind(this)}
+          onCancel={() => {
+            this.setState({ openLoad: false });
+          }}
         />
       </div>
     );

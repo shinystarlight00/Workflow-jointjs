@@ -79,24 +79,25 @@ class SaveDialog extends React.Component {
   }
 
   onSubmit() {
+    const formData = new FormData();
+    formData.append("title", this.state.title);
+    formData.append("data", JSON.stringify(this.state.data));
+
     fetch("http://localhost:8050/dtgreen/SysAdmin/AddStep2.php", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        data: "hello world!",
-      }),
+      body: formData,
     })
-      //   .then((response) => response.json())
+      .then((response) => response.json())
       .then((data) => {
-        console.log("Success:", data);
-        // Handle success (e.g., show a success message, close the dialog)
-        // this.props.onSaveSuccess(data);
+        if (data.status == "Success") {
+          alert("Workflow data saved successfully!");
+          this.props.onCancel();
+        } else {
+          alert("Error! ", data.error);
+        }
       })
       .catch((error) => {
         console.error("Error:", error);
-        // Handle error (e.g., show an error message)
       });
   }
 
@@ -147,7 +148,7 @@ class SaveDialog extends React.Component {
 SaveDialog.propTypes = {
   open: PropTypes.bool.isRequired,
   onCancel: PropTypes.func.isRequired,
-  data: PropTypes.string.isRequired,
+  data: PropTypes.object.isRequired,
 };
 
 export default SaveDialog;
