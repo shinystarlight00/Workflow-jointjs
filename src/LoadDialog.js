@@ -36,7 +36,7 @@ class LoadDialog extends React.Component {
       .then((response) => response.json())
       .then((data) => {
         if (data.status == "Success") {
-          this.setState({ list: data.data });
+          this.setState({ list: JSON.parse(data.data) });
         } else {
           alert("Error! ", data.error);
         }
@@ -58,6 +58,7 @@ class LoadDialog extends React.Component {
       .then((data) => {
         if (data.status == "Success") {
           this.props.onLoad(data.data);
+          this.props.onCancel();
         } else {
           alert("Error! ", data.error);
         }

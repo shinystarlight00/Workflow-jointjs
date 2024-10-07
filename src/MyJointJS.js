@@ -571,7 +571,15 @@ class MyJointJS extends React.Component {
   }
 
   _onLoadData(data) {
-    console.log("=========> loaded data ", data);
+    const wfdata = JSON.parse(data).json_data;
+
+    this._deleteAll();
+
+    try {
+      this.graph.fromJSON(wfdata);
+    } catch (error) {
+      console.error("Error loading graph from JSON: ", error);
+    }
   }
 
   /**
