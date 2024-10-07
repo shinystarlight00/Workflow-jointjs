@@ -583,6 +583,7 @@ class MyJointJS extends React.Component {
             refY: "50%",
             fontSize: 14,
             fill: "black",
+            text: cell.attrs.label.text,
           },
         };
         cell.markup = [
