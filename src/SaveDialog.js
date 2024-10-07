@@ -81,7 +81,7 @@ class SaveDialog extends React.Component {
   onSubmit() {
     const formData = new FormData();
     formData.append("title", this.state.title);
-    formData.append("data", JSON.stringify(this.state.data));
+    formData.append("data", this.state.data);
 
     fetch("http://localhost:8050/dtgreen/SysAdmin/AddStep2.php", {
       method: "POST",
@@ -148,7 +148,7 @@ class SaveDialog extends React.Component {
 SaveDialog.propTypes = {
   open: PropTypes.bool.isRequired,
   onCancel: PropTypes.func.isRequired,
-  data: PropTypes.object.isRequired,
+  data: PropTypes.string.isRequired,
 };
 
 export default SaveDialog;

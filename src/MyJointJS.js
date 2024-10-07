@@ -440,7 +440,7 @@ class MyJointJS extends React.Component {
 
     this.setState({
       openSave: true,
-      saveText: graphData,
+      saveText: JSON.stringify(graphData),
     });
   }
 
@@ -570,7 +570,7 @@ class MyJointJS extends React.Component {
     this.graph.removeCells(allCells);
   }
 
-  _onLoadData(data) {
+  __(data) {
     console.log("=========> loaded data ", data);
   }
 
@@ -814,7 +814,7 @@ class MyJointJS extends React.Component {
         {/* LOAD DIALOG */}
         <LoadDialog
           open={this.state.openLoad}
-          onLoad={this.onLoadData.bind(this)}
+          onLoad={this._loadData.bind(this)}
           onCancel={() => {
             this.setState({ openLoad: false });
           }}
