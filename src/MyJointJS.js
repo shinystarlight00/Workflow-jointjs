@@ -23,6 +23,7 @@ import yaml from "js-yaml";
 import WFUtils from "./WFUtils";
 import MessageDialog from "./MessageDialog.js";
 import JointJSUtils from "./JointJSUtils.js";
+import SaveDialog from "./SaveDialog.js";
 
 // https://fontawesome.com/v4.7/icons/
 
@@ -438,10 +439,13 @@ class MyJointJS extends React.Component {
     });
   }
 
-  _sendData() {
+  _saveData() {
     const graphData = this.graph.toJSON();
 
-    console.log("=========> Graph data: ", JSON.stringify(graphData));
+    this.setState({
+      openSave: true,
+      saveText: graphData,
+    });
   }
 
   _menuClose() {
@@ -744,7 +748,7 @@ class MyJointJS extends React.Component {
             color="primary"
             variant="contained"
             onClick={() => {
-              this._sendData();
+              this._saveData();
             }}
           >
             Save
@@ -785,25 +789,6 @@ class MyJointJS extends React.Component {
           <Button
             onClick={() => {
               this.setState({ openLoad: false });
-            }}
-          >
-            Close
-          </Button>
-        </Dialog>
-
-        {/* SAVE */}
-        <Dialog open={this.state.openSave} fullWidth>
-          <p>Save</p>
-          <Input
-            type="text"
-            value={this.state.saveText}
-            multiline
-            rows="12"
-            readOnly
-          ></Input>
-          <Button
-            onClick={() => {
-              this.setState({ openSave: false });
             }}
           >
             Close
@@ -908,7 +893,13 @@ class MyJointJS extends React.Component {
           onClose={() => this.setState({ aboutDialogOpen: false })}
         />
 
-        {/* <SaveDialogue /> */}
+        <SaveDialog
+          data={this.state.saveText}
+          onCancel={() => {
+            this.setState({ openSave: false });
+          }}
+          open={this.state.openSave}
+        />
       </div>
     );
   } // render
