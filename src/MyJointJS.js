@@ -568,7 +568,7 @@ class MyJointJS extends React.Component {
     jsondata.cells.forEach((cell) => {
       // Ensure that rectangles have the correct markup field
       if (cell.type === "workflow.Rectangle" && !cell.markup) {
-        cell.attr = {
+        cell.attrs = {
           body: {
             refWidth: "100%",
             refHeight: "100%",
