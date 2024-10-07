@@ -573,10 +573,20 @@ class MyJointJS extends React.Component {
   _onLoadData(data) {
     const wfdata = JSON.parse(data).json_data;
 
+    const jsondata = JSON.parse(wfdata);
+
+    jsondata.cells.forEach((cell) => {
+      // Ensure that rectangles have the correct markup field
+      if (cell.type === "workflow.Rectangle" && !cell.markup) {
+        cell.markup =
+          '<g class="rotatable"><g class="scalable"><rect/></g><text/></g>';
+      }
+    });
+
     this._deleteAll();
 
     try {
-      this.graph.fromJSON(wfdata);
+      this.graph.fromJSON(jsondata);
     } catch (error) {
       console.error("Error loading graph from JSON: ", error);
     }
