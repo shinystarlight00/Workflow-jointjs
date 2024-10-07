@@ -574,7 +574,7 @@ class MyJointJS extends React.Component {
             refHeight: "100%",
             strokeWidth: 2,
             stroke: "#000000",
-            fill: "#FFFFFF",
+            fill: WFShape_BaseColor,
           },
           label: {
             textVerticalAnchor: "middle",
@@ -582,7 +582,7 @@ class MyJointJS extends React.Component {
             refX: "50%",
             refY: "50%",
             fontSize: 14,
-            fill: "#333333",
+            fill: "black",
           },
         };
         cell.markup = [
