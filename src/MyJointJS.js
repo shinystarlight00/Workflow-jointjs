@@ -763,7 +763,6 @@ class MyJointJS extends React.Component {
       marginX: 50,
       marginY: 50,
     });
-    console.log("Laid out!");
   } // _layout
 
   render() {
