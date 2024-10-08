@@ -1,3 +1,9 @@
-workflow project using jointjs
+Workflow project using jointjs
 
-you can make diagram or workflow with
+You can make diagram or workflow with this
+
+run
+
+npm start
+
+to start!
