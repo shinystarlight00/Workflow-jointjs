@@ -31,22 +31,12 @@ import LoadDialog from "./LoadDialog.js";
 const WFShape_BaseColor = "#daecf2";
 const WFShape_InColor = "#4fa8d1";
 const WFShape_OutColor = "#daf2dc";
-const WFShape_CallIcon = "\uf0ac";
-const WFShape_AssignIcon = "\uf061";
-const WFShape_SwitchIcon = "\uf047";
-const WFShape_ReturnIcon = "\uf00c";
 const WFShape_Width = 140;
 const WFShape_Height = 70;
 const WFShape_RemoveDistance = -30;
 
-const WFShapeMap = {
-  "100step": {
-    icon: WFShape_CallIcon,
-  },
-  "102step": {
-    icon: WFShape_AssignIcon,
-  },
-};
+const WFShape_SuccessPort = "#00FF00";
+const WFShape_FailurePort = "#FFC0CB";
 
 const portsDef = {
   groups: {
@@ -130,10 +120,6 @@ const WFRect = joint.dia.Element.define(
       {
         tagName: "text",
         selector: "label",
-      },
-      {
-        tagName: "text",
-        selector: "icon",
       },
     ],
   }
@@ -313,8 +299,16 @@ class MyJointJS extends React.Component {
       },
     });
     rect.addPort({ id: "in", group: "in" });
-    rect.addPort({ id: "out-succ", group: "out" });
-    rect.addPort({ id: "out-fail", group: "out" });
+    rect.addPort({
+      id: "out-succ",
+      group: "out",
+      attrs: { circle: { fill: WFShape_SuccessPort } },
+    });
+    rect.addPort({
+      id: "out-fail",
+      group: "out",
+      attrs: { circle: { fill: WFShape_FailurePort } },
+    });
     rect.addTo(this.graph);
     rect.set("wf", {
       [stepName]: {
@@ -386,7 +380,11 @@ class MyJointJS extends React.Component {
       },
     });
     rect.addPort({ group: "in" });
-    rect.addPort({ id: "out-succ", group: "out" });
+    rect.addPort({
+      id: "out-succ",
+      group: "out",
+      attrs: { circle: { fill: WFShape_SuccessPort } },
+    });
     rect.addTo(this.graph);
     rect.set("wf", {
       [stepName]: {
@@ -460,7 +458,6 @@ class MyJointJS extends React.Component {
     let type = WFUtils.getStepType(wf);
     let originalWf = jjsElement.get("wf"); // Save the original WF value
     jjsElement.set("wf", wf);
-    jjsElement.attr("icon/text", WFShapeMap[type].icon);
     let stepName = WFUtils.getStepName(wf);
     jjsElement.attr("label/text", stepName);
 
