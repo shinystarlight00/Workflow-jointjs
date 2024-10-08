@@ -80,6 +80,7 @@ class SaveDialog extends React.Component {
 
   onSubmit() {
     const formData = new FormData();
+    formData.append("appID", this.props.addID);
     formData.append("title", this.state.title);
     formData.append("data", this.state.data);
 

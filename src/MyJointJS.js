@@ -23,7 +23,6 @@ import yaml from "js-yaml";
 import WFUtils from "./WFUtils";
 import MessageDialog from "./MessageDialog.js";
 import JointJSUtils from "./JointJSUtils.js";
-import SaveDialog from "./SaveDialog.js";
 import LoadDialog from "./LoadDialog.js";
 
 // https://fontawesome.com/v4.7/icons/
@@ -256,8 +255,14 @@ class MyJointJS extends React.Component {
       e.preventDefault();
     });
 
-    this._generateStartAndEnd(true);
-    this._generateStartAndEnd(false);
+    const loadData = this._loadData();
+
+    if (loadData) {
+      this._onLoadData(loadData);
+    } else {
+      this._generateStartAndEnd(true);
+      this._generateStartAndEnd(false);
+    }
   } // componentDidMount
 
   _setLayoutDirection(direction) {
@@ -426,14 +431,46 @@ class MyJointJS extends React.Component {
   _saveData() {
     const graphData = this.graph.toJSON();
 
-    this.setState({
-      openSave: true,
-      saveText: JSON.stringify(graphData),
-    });
+    const formData = new FormData();
+    formData.append("appID", this.props.addID);
+    formData.append("data", JSON.stringify(graphData));
+
+    fetch("http://localhost:8050/dtgreen/SysAdmin/AddStep2.php", {
+      method: "POST",
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.status == "Success") {
+          alert("Workflow data saved successfully!");
+        } else {
+          alert("Error! ", data.error);
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
   }
 
   _loadData() {
-    this.setState({ openLoad: true });
+    const formData = new FormData();
+    formData.append("appID", this.props.appID);
+
+    fetch("http://localhost:8050/dtgreen/SysAdmin/GetFlow.php", {
+      method: "POST",
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.status == "Success") {
+          return data.data;
+        } else {
+          return false;
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
   }
 
   _menuClose() {
@@ -774,16 +811,6 @@ class MyJointJS extends React.Component {
             color="primary"
             variant="contained"
             onClick={() => {
-              this._loadData();
-            }}
-            style={{ marginRight: 20 }}
-          >
-            Load
-          </Button>
-          <Button
-            color="primary"
-            variant="contained"
-            onClick={() => {
               this._saveData();
             }}
             style={{ marginRight: 20 }}
@@ -834,24 +861,6 @@ class MyJointJS extends React.Component {
           wf={this.state.wf}
           onOk={this._settingsOk.bind(this)}
           onCancel={this._settingsCancel.bind(this)}
-        />
-
-        {/* SAVE DIALOG */}
-        <SaveDialog
-          data={this.state.saveText}
-          onCancel={() => {
-            this.setState({ openSave: false });
-          }}
-          open={this.state.openSave}
-        />
-
-        {/* LOAD DIALOG */}
-        <LoadDialog
-          open={this.state.openLoad}
-          onLoad={this._onLoadData.bind(this)}
-          onCancel={() => {
-            this.setState({ openLoad: false });
-          }}
         />
       </div>
     );
