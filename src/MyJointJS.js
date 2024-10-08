@@ -363,8 +363,8 @@ class MyJointJS extends React.Component {
       ports: portsDef,
     });
 
-    const screenWidth = window.innerWidth;
-    const screenHeight = window.innerHeight;
+    const screenWidth = this.paper.getComputedSize().width;
+    const screenHeight = this.paper.getComputedSize().height;
 
     const centerPos = screenWidth / 2 - WFShape_Width / 2;
 
