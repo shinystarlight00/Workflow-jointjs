@@ -9,11 +9,6 @@ import PropTypes from "prop-types";
 
 import Box from "@material-ui/core/Box";
 
-const WFShape_CallIcon = "\uf0ac";
-const WFShape_AssignIcon = "\uf061";
-const WFShape_SwitchIcon = "\uf047";
-const WFShape_ReturnIcon = "\uf00c";
-
 /**
  * <Settings wf=<Object>/>
  *
@@ -201,24 +196,8 @@ class Settings extends React.Component {
                 this._typeChange(e.target.value);
               }}
             >
-              <MenuItem value={"100step"}>
-                <Typography
-                  component="span"
-                  style={{ fontFamily: "fontawesome" }}
-                >
-                  {WFShape_CallIcon}
-                </Typography>
-                &nbsp;100-MakeCallWithoutCPA
-              </MenuItem>
-              <MenuItem value={"102step"}>
-                <Typography
-                  component="span"
-                  style={{ fontFamily: "fontawesome" }}
-                >
-                  {WFShape_AssignIcon}
-                </Typography>
-                &nbsp;102-Ringless Dialing
-              </MenuItem>
+              <MenuItem value={"100step"}>100-MakeCallWithoutCPA</MenuItem>
+              <MenuItem value={"102step"}>102-Ringless Dialing</MenuItem>
             </TextField>
           </Grid>
         </Grid>
