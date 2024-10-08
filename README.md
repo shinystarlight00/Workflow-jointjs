@@ -1,6 +1,6 @@
-##Workflow project using jointjs
+Workflow project using jointjs
 
-#You can make diagram or workflow with this
+You can make diagram or workflow with this
 
 ```bash
 run
