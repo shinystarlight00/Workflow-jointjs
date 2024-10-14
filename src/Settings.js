@@ -1,9 +1,7 @@
 import React from "react";
 import MenuItem from "@material-ui/core/MenuItem";
 import TextField from "@material-ui/core/TextField";
-import NameValueList from "./NameValueList.js";
 import Grid from "@material-ui/core/Grid";
-import Typography from "@material-ui/core/Typography";
 import WFUtils from "./WFUtils.js";
 import PropTypes from "prop-types";
 

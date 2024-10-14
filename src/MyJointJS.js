@@ -3,27 +3,14 @@ import * as dagre from "dagre";
 import graphlib from "graphlib";
 import React from "react";
 import Button from "@material-ui/core/Button";
-import Dialog from "@material-ui/core/Dialog";
-import Input from "@material-ui/core/Input";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 
-import Divider from "@material-ui/core/Divider";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-import Typography from "@material-ui/core/Typography";
-import IconButton from "@material-ui/core/IconButton";
-import MenuIcon from "@material-ui/icons/Menu";
 import Grid from "@material-ui/core/Grid";
 import SettingsDialog from "./SettingsDialog.js";
-import YAMLInputDialog from "./YAMLInputDialog.js";
-import YAMLOutputDialog from "./YAMLOutputDialog.js";
 import clone from "just-clone";
-import yaml from "js-yaml";
 import WFUtils from "./WFUtils";
-import MessageDialog from "./MessageDialog.js";
 import JointJSUtils from "./JointJSUtils.js";
-import LoadDialog from "./LoadDialog.js";
 
 // https://fontawesome.com/v4.7/icons/
 
@@ -432,7 +419,7 @@ class MyJointJS extends React.Component {
     const graphData = this.graph.toJSON();
 
     const formData = new FormData();
-    formData.append("appID", this.props.addID);
+    formData.append("appID", this.props.appID);
     formData.append("data", JSON.stringify(graphData));
 
     fetch("http://localhost:8050/dtgreen/SysAdmin/AddStep2.php", {
@@ -646,72 +633,6 @@ class MyJointJS extends React.Component {
     }
   }
 
-  /**
-   * Given a YAML Object as input, create the correct graph.
-   * @param {*} yamlObj
-   */
-  _parseWF(yamlObj) {
-    const addLink = (source, target) => {
-      const link = new joint.shapes.standard.Link();
-      link.source(source);
-      link.target(target);
-      link.addTo(this.graph);
-      const linkView = link.findView(this.paper);
-      linkView.addTools(
-        new joint.dia.ToolsView({
-          tools: [
-            new joint.linkTools.Remove({ distance: WFShape_RemoveDistance }),
-          ],
-        })
-      );
-      linkView.hideTools();
-    };
-    this._deleteAll();
-    // We create an element for each step in the YAML.
-    yamlObj.forEach((wp) => {
-      const element = this._add(false);
-      this._setElementFromWF(element, wp);
-    });
-    // Now all the elements are in place, we can start wiring them up!
-    yamlObj.forEach((wp) => {
-      const stepName = WFUtils.getStepName(wp);
-      const content = WFUtils.getStepContent(wp);
-      const stepType = WFUtils.getStepType(wp);
-
-      if (stepType !== "switch") {
-        const targetStepName = content.next;
-        console.log(`Create link from ${stepName} to ${targetStepName}`);
-        if (targetStepName && targetStepName !== "end") {
-          const sourceElement = this._getElementFromStepName(stepName);
-          const targetElement = this._getElementFromStepName(targetStepName);
-          const sourcePort = sourceElement.getGroupPorts("out")[0];
-          const targetPort = targetElement.getGroupPorts("in")[0];
-          addLink(
-            { id: sourceElement.id, port: sourcePort.id },
-            { id: targetElement.id, port: targetPort.id }
-          );
-        }
-      } // End Not switch
-      else {
-        const conditions = content.switch;
-        const sourceElement = this._getElementFromStepName(stepName);
-        conditions.forEach((condition) => {
-          const targetStepName = condition.next;
-          if (targetStepName) {
-            const sourcePortId = condition.condition;
-            const targetElement = this._getElementFromStepName(targetStepName);
-            const targetPort = targetElement.getGroupPorts("in")[0];
-            addLink(
-              { id: sourceElement.id, port: sourcePortId },
-              { id: targetElement.id, port: targetPort.id }
-            );
-          }
-        });
-      } // End ... this is a switch
-    });
-    this._layout();
-  }
-
   _getElementFromStepName(stepName) {
     const foundElement = this.graph.getElements().find((element) => {
       const wf = element.get("wf");
@@ -725,79 +646,6 @@ class MyJointJS extends React.Component {
     });
     return foundElement;
   }
-
-  /**
-   * Build the final Workflow JSON for the solution
-   */
-  _buildWF() {
-    // Iterate over each of the WF shapes
-    const elements = this.graph.getElements();
-    const completeWF = [];
-    elements.forEach((element) => {
-      const wf = clone(element.get("wf"));
-
-      const stepType = WFUtils.getStepType(wf);
-      if (stepType !== "switch") {
-        // Now we need to see what it links to!
-        const neighbors = this.graph.getNeighbors(element, {
-          outbound: true,
-        });
-        console.assert(neighbors.length < 2);
-        if (neighbors.length === 1) {
-          const nextWF = neighbors[0].get("wf");
-          const nextStepName = WFUtils.getStepName(nextWF);
-          WFUtils.getStepContent(wf).next = nextStepName;
-        } else {
-          if (stepType !== "return") {
-            WFUtils.getStepContent(wf).next = "end";
-          }
-        }
-      } else {
-        // It IS a switch!!!  We now need to get all the conditions in the WF and see if they are linked!
-        const conditions = WFUtils.getConditions(wf);
-        const connectedLinks = this.graph.getConnectedLinks(element, {
-          outbound: true,
-        });
-        conditions.forEach((condition) => {
-          // Condition is an object that contains {condition, next}
-          const conditionLink = connectedLinks.find((link) => {
-            if (link.source().port === condition.condition) {
-              return true;
-            }
-            return false;
-          });
-          if (conditionLink) {
-            const targetElement = conditionLink.getTargetElement();
-            const targetWF = targetElement.get("wf");
-            condition.next = WFUtils.getStepName(targetWF);
-          }
-        });
-      }
-      completeWF.push(wf);
-    });
-    const y = yaml.dump(completeWF);
-    console.log(y);
-    this.setState({ yamlText: y, yamlOutputShowDialog: true });
-  } // _buildWF
-
-  /**
-   * Layout the graph.
-   */
-  _layout() {
-    let rankDir = "LR";
-    if (this.state.layoutDirection === "TB") {
-      rankDir = "TB";
-    }
-    joint.layout.DirectedGraph.layout(this.graph, {
-      dagre,
-      graphlib,
-      nodeSep: 50,
-      edgeSep: 80,
-      rankDir,
-      marginX: 50,
-      marginY: 50,
-    });
-  } // _layout
 
   render() {
     return (
