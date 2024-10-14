@@ -174,17 +174,21 @@ class MyJointJS extends React.Component {
           const wf = fromView.model.get("wf");
           const fromStepName = WFUtils.getStepName(wf);
           const fromStepType = WFUtils.getStepType(wf);
-          const toStepName = WFUtils.getStepName(toView.model.get("wf"));
+          const fromstepParams = wf[fromStepName][fromStepType];
 
-          const stepParams = wf[fromStepName][fromStepType];
+          const toStepWF = toView.model.get("wf");
+          const toStepName = WFUtils.getStepName(toStepWF);
+          const toStepType = WFUtils.getStepType(toStepWF);
+          const toStepParams = toStepWF[toStepName][toStepType];
+
           const param =
             magnet.getAttribute("port") == "out-succ"
               ? "onSuccess"
               : "onFailure";
 
           wf[fromStepName][fromStepType] = {
-            ...stepParams,
-            [param]: toStepName,
+            ...fromstepParams,
+            [param]: toStepParams.stepCount,
           };
         };
 
@@ -274,6 +278,8 @@ class MyJointJS extends React.Component {
 
   _addStep(flag) {
     let stepName = `Step${this.stepCount}`;
+    let stepCount = this.stepCount;
+
     this.stepCount++;
 
     let rect = new WFRect({
@@ -304,7 +310,9 @@ class MyJointJS extends React.Component {
     rect.addTo(this.graph);
     rect.set("wf", {
       [stepName]: {
-        "100step": {},
+        "100step": {
+          stepCount: stepCount,
+        },
       },
     });
 
@@ -380,7 +388,9 @@ class MyJointJS extends React.Component {
     rect.addTo(this.graph);
     rect.set("wf", {
       [stepName]: {
-        "100step": {},
+        "100step": {
+          stepCount: start ? 0 : 999,
+        },
       },
     });
 
@@ -417,6 +427,8 @@ class MyJointJS extends React.Component {
 
   _saveData() {
     const graphData = this.graph.toJSON();
+
+    console.log("=========>data ", graphData);
 
     const formData = new FormData();
     formData.append("appID", this.props.appID);

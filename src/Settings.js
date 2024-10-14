@@ -144,10 +144,18 @@ class Settings extends React.Component {
     };
 
     if (newType === "100step") {
-      newValues.params = { digit: "", seconds: "" };
+      newValues.params = {
+        digit: "",
+        seconds: "",
+        stepCount: this.state.params.stepCount,
+      };
     }
     if (newType === "102step") {
-      newValues.params = { onSuccess: "", onFailure: "" };
+      newValues.params = {
+        onSuccess: "",
+        onFailure: "",
+        stepCount: this.state.params.stepCount,
+      };
     }
     this.setState(newValues, this._settingsChanged);
   } // _typeChange
@@ -161,7 +169,7 @@ class Settings extends React.Component {
     return (
       <Box>
         <Grid container spacing={2}>
-          <Grid item xs={6}>
+          <Grid item xs={4}>
             <TextField
               label="Step Name"
               value={this.state.stepName}
@@ -183,7 +191,7 @@ class Settings extends React.Component {
           </Grid>
           <Grid item xs={6}>
             <TextField
-              label="type"
+              label="Type"
               value={this.state.type}
               inputProps={{
                 spellCheck: "false",
@@ -197,6 +205,17 @@ class Settings extends React.Component {
               <MenuItem value={"100step"}>100-MakeCallWithoutCPA</MenuItem>
               <MenuItem value={"102step"}>102-Ringless Dialing</MenuItem>
             </TextField>
+          </Grid>
+          <Grid item xs={2}>
+            <TextField
+              label="Count"
+              value={this.state.params.stepCount}
+              inputProps={{
+                spellCheck: "false",
+              }}
+              variant="outlined"
+              disabled
+            ></TextField>
           </Grid>
         </Grid>
 
@@ -248,62 +267,60 @@ class Settings extends React.Component {
         ) : (
           ""
         )}
-        {this.state.type === "102step" ? (
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <TextField
-                value={this.state.params.onSuccess}
-                label="Next Step On Success"
-                fullWidth
-                inputProps={{
-                  spellCheck: "false",
-                }}
-                error={this.state._error_onSuccess}
-                helperText={this.state._error_message_onSuccess}
-                variant="outlined"
-                required
-                onChange={(e) => {
-                  this.setState(
-                    {
-                      params: {
-                        ...this.state.params,
-                        onSuccess: e.target.value,
-                      },
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <TextField
+              value={this.state.params.onSuccess}
+              label="Next Step On Success"
+              fullWidth
+              inputProps={{
+                spellCheck: "false",
+              }}
+              error={this.state._error_onSuccess}
+              helperText={this.state._error_message_onSuccess}
+              variant="outlined"
+              required
+              disabled
+              onChange={(e) => {
+                this.setState(
+                  {
+                    params: {
+                      ...this.state.params,
+                      onSuccess: e.target.value,
                     },
-                    this._settingsChanged
-                  );
-                }}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                value={this.state.params.onFailure}
-                label="Next Step On Failure"
-                fullWidth
-                inputProps={{
-                  spellCheck: "false",
-                }}
-                error={this.state._error_onFailure}
-                helperText={this.state._error_message_onFailure}
-                variant="outlined"
-                required
-                onChange={(e) => {
-                  this.setState(
-                    {
-                      params: {
-                        ...this.state.params,
-                        onFailure: e.target.value,
-                      },
-                    },
-                    this._settingsChanged
-                  );
-                }}
-              />
-            </Grid>
+                  },
+                  this._settingsChanged
+                );
+              }}
+            />
           </Grid>
-        ) : (
-          ""
-        )}
+          <Grid item xs={12}>
+            <TextField
+              value={this.state.params.onFailure}
+              label="Next Step On Failure"
+              fullWidth
+              inputProps={{
+                spellCheck: "false",
+              }}
+              error={this.state._error_onFailure}
+              helperText={this.state._error_message_onFailure}
+              variant="outlined"
+              required
+              disabled
+              onChange={(e) => {
+                this.setState(
+                  {
+                    params: {
+                      ...this.state.params,
+                      onFailure: e.target.value,
+                    },
+                  },
+                  this._settingsChanged
+                );
+              }}
+            />
+          </Grid>
+        </Grid>
       </Box>
     );
   }
