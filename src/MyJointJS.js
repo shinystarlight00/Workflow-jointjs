@@ -183,12 +183,12 @@ class MyJointJS extends React.Component {
 
           const param =
             magnet.getAttribute("port") == "out-succ"
-              ? "onSuccess"
-              : "onFailure";
+              ? "NextStepOnSuccess"
+              : "NextStepOnFailure";
 
           wf[fromStepName][fromStepType] = {
             ...fromstepParams,
-            [param]: toStepParams.stepCount,
+            [param]: toStepParams.StepNumber,
           };
         };
 
@@ -311,7 +311,7 @@ class MyJointJS extends React.Component {
     rect.set("wf", {
       [stepName]: {
         "100step": {
-          stepCount: stepCount,
+          StepNumber: stepCount,
         },
       },
     });
@@ -389,7 +389,7 @@ class MyJointJS extends React.Component {
     rect.set("wf", {
       [stepName]: {
         "100step": {
-          stepCount: start ? 0 : 999,
+          StepNumber: start ? 0 : 999,
         },
       },
     });

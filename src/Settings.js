@@ -143,20 +143,12 @@ class Settings extends React.Component {
       items: [],
     };
 
-    if (newType === "100step") {
-      newValues.params = {
-        digit: "",
-        seconds: "",
-        stepCount: this.state.params.stepCount,
-      };
-    }
-    if (newType === "102step") {
-      newValues.params = {
-        onSuccess: "",
-        onFailure: "",
-        stepCount: this.state.params.stepCount,
-      };
-    }
+    newValues.params = {
+      NextStepOnSuccess: this.state.params.NextStepOnSuccess,
+      NextStepOnFailure: this.state.params.NextStepOnFailure,
+      StepNumber: this.state.params.StepNumber,
+    };
+
     this.setState(newValues, this._settingsChanged);
   } // _typeChange
 
@@ -209,7 +201,7 @@ class Settings extends React.Component {
           <Grid item xs={2}>
             <TextField
               label="Count"
-              value={this.state.params.stepCount}
+              value={this.state.params.StepNumber}
               inputProps={{
                 spellCheck: "false",
               }}
@@ -223,7 +215,7 @@ class Settings extends React.Component {
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField
-                value={this.state.params.digit}
+                value={this.state.params.MaxDigits}
                 label="Max Digit"
                 fullWidth
                 inputProps={{
@@ -235,7 +227,12 @@ class Settings extends React.Component {
                 required
                 onChange={(e) => {
                   this.setState(
-                    { params: { ...this.state.params, digit: e.target.value } },
+                    {
+                      params: {
+                        ...this.state.params,
+                        MaxDigits: e.target.value,
+                      },
+                    },
                     this._settingsChanged
                   );
                 }}
@@ -243,7 +240,7 @@ class Settings extends React.Component {
             </Grid>
             <Grid item xs={12}>
               <TextField
-                value={this.state.params.seconds}
+                value={this.state.params.MaxSeconds}
                 label="Max Seconds"
                 fullWidth
                 inputProps={{
@@ -256,7 +253,10 @@ class Settings extends React.Component {
                 onChange={(e) => {
                   this.setState(
                     {
-                      params: { ...this.state.params, seconds: e.target.value },
+                      params: {
+                        ...this.state.params,
+                        MaxSeconds: e.target.value,
+                      },
                     },
                     this._settingsChanged
                   );
@@ -270,7 +270,7 @@ class Settings extends React.Component {
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <TextField
-              value={this.state.params.onSuccess}
+              value={this.state.params.NextStepOnSuccess}
               label="Next Step On Success"
               fullWidth
               inputProps={{
@@ -286,7 +286,7 @@ class Settings extends React.Component {
                   {
                     params: {
                       ...this.state.params,
-                      onSuccess: e.target.value,
+                      NextStepOnSuccess: e.target.value,
                     },
                   },
                   this._settingsChanged
@@ -296,7 +296,7 @@ class Settings extends React.Component {
           </Grid>
           <Grid item xs={12}>
             <TextField
-              value={this.state.params.onFailure}
+              value={this.state.params.NextStepOnFailure}
               label="Next Step On Failure"
               fullWidth
               inputProps={{
@@ -312,7 +312,7 @@ class Settings extends React.Component {
                   {
                     params: {
                       ...this.state.params,
-                      onFailure: e.target.value,
+                      NextStepOnFailure: e.target.value,
                     },
                   },
                   this._settingsChanged
