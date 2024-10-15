@@ -246,15 +246,7 @@ class MyJointJS extends React.Component {
       e.preventDefault();
     });
 
-    const loadData = this._loadData();
-
-    if (loadData) {
-      console.log("===> result ", loadData);
-      this._onLoadData(loadData);
-    } else {
-      this._generateStartAndEnd(true);
-      this._generateStartAndEnd(false);
-    }
+    this._generateFlowData();
   } // componentDidMount
 
   _setLayoutDirection(direction) {
@@ -359,6 +351,18 @@ class MyJointJS extends React.Component {
     return rect;
   }
 
+  async _generateFlowData() {
+    const loadData = await this._loadData();
+
+    if (loadData) {
+      console.log("===> result ", loadData);
+      this._onLoadData(loadData);
+    } else {
+      this._generateStartAndEnd(true);
+      this._generateStartAndEnd(false);
+    }
+  }
+
   _generateStartAndEnd(start) {
     let stepName = start ? "Start" : "End";
 
@@ -456,11 +460,11 @@ class MyJointJS extends React.Component {
       });
   }
 
-  _loadData() {
+  async _loadData() {
     const formData = new FormData();
     formData.append("appID", this.props.appID);
 
-    fetch("http://localhost:8050/dtgreen/SysAdmin/GetFlow.php", {
+    await fetch("http://localhost:8050/dtgreen/SysAdmin/GetFlow.php", {
       method: "POST",
       body: formData,
     })
