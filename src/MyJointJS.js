@@ -312,8 +312,8 @@ class MyJointJS extends React.Component {
       [stepName]: {
         "100step": {
           StepNumber: stepCount,
-          NextStepOnSuccess: "",
-          NextStepOnFailure: "",
+          NextStepOnSuccess: "1000",
+          NextStepOnFailure: "1000",
         },
       },
     });
@@ -392,8 +392,8 @@ class MyJointJS extends React.Component {
       [stepName]: {
         "100step": {
           StepNumber: start ? 0 : 999,
-          NextStepOnSuccess: "",
-          NextStepOnFailure: "",
+          NextStepOnSuccess: "1000",
+          NextStepOnFailure: "1000",
         },
       },
     });
