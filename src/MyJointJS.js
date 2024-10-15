@@ -353,7 +353,6 @@ class MyJointJS extends React.Component {
 
   async _generateFlowData() {
     const loadData = await this._loadData();
-
     if (loadData) {
       console.log("===> result ", loadData);
       this._onLoadData(loadData);
@@ -464,21 +463,27 @@ class MyJointJS extends React.Component {
     const formData = new FormData();
     formData.append("appID", this.props.appID);
 
-    await fetch("http://localhost:8050/dtgreen/SysAdmin/GetFlow.php", {
-      method: "POST",
-      body: formData,
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.status == "Success") {
-          return data.data;
-        } else {
-          return false;
+    try {
+      const response = await fetch(
+        "http://localhost:8050/dtgreen/SysAdmin/GetFlow.php",
+        {
+          method: "POST",
+          body: formData,
         }
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+      );
+
+      const data = await response.json();
+
+      if (data.status === "Success") {
+        return data.data;
+      } else {
+        console.error("Error loading data:", data.error);
+        return null;
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      return null;
+    }
   }
 
   _menuClose() {
