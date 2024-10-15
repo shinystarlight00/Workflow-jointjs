@@ -36,14 +36,8 @@ function getStepType(wf) {
     throw new Error("No wf parameter");
   }
   const stepContent = getStepContent(wf);
-  if (stepContent.hasOwnProperty("100step")) {
-    return "100step";
-  }
-  if (stepContent.hasOwnProperty("102step")) {
-    return "102step";
-  }
-  console.error("Unknown step type!");
-  return "UNKNOWN_STEP_TYPE";
+
+  return Object.keys(stepContent)[0];
 }
 
 function getConditions(wf) {

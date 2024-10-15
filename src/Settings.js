@@ -194,8 +194,29 @@ class Settings extends React.Component {
                 this._typeChange(e.target.value);
               }}
             >
+              <MenuItem value={"1step"}>1-WaitForCommand</MenuItem>
               <MenuItem value={"100step"}>100-MakeCallWithoutCPA</MenuItem>
               <MenuItem value={"102step"}>102-Ringless Dialing</MenuItem>
+              <MenuItem value={"101step"}>101-MakeCallWithCPA</MenuItem>
+              <MenuItem value={"200step"}>200-Play Only</MenuItem>
+              <MenuItem value={"300step"}>300-PlayCollectOneDigit</MenuItem>
+              <MenuItem value={"400step"}>400-RecordVM</MenuItem>
+              <MenuItem value={"500step"}>500-BlindTransfer</MenuItem>
+              <MenuItem value={"999step"}>999-EndCall</MenuItem>
+              <MenuItem value={"700step"}>700-AddToDNCList</MenuItem>
+              <MenuItem value={"550step"}>550-AttendedTransfer</MenuItem>
+              <MenuItem value={"201step"}>201-Drop Msg on AM</MenuItem>
+              <MenuItem value={"710step"}>710-Sleep</MenuItem>
+              <MenuItem value={"301step"}>
+                301-PlayCollectMultipleDigits
+              </MenuItem>
+              <MenuItem value={"302step"}>302-PlayDetectSpeech</MenuItem>
+              <MenuItem value={"715step"}>715-DeleteRecordedSession</MenuItem>
+              <MenuItem value={"303step"}>
+                303-Drop Msg on AM with Collect Digit
+              </MenuItem>
+              <MenuItem value={"401step"}>401-RecordVM on AM</MenuItem>
+              <MenuItem value={"105step"}>105-DNIS Lookup</MenuItem>
             </TextField>
           </Grid>
           <Grid item xs={2}>
