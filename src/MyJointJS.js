@@ -246,14 +246,15 @@ class MyJointJS extends React.Component {
       e.preventDefault();
     });
 
-    // const loadData = this._loadData();
+    const loadData = this._loadData();
 
-    // if (loadData) {
-    //   this._onLoadData(loadData);
-    // } else {
-    this._generateStartAndEnd(true);
-    this._generateStartAndEnd(false);
-    // }
+    if (loadData) {
+      console.log("===> result ", loadData);
+      // this._onLoadData(loadData);
+    } else {
+      this._generateStartAndEnd(true);
+      this._generateStartAndEnd(false);
+    }
   } // componentDidMount
 
   _setLayoutDirection(direction) {
