@@ -353,60 +353,9 @@ class MyJointJS extends React.Component {
   }
 
   async _generateFlowData() {
-    // const loadData = await this._loadData();
-    const loadData = [
-      {
-        StepID: "39441",
-        AppID: "1010",
-        StepNumber: "1",
-        StepType: "100",
-        StepName: "Start",
-        WebStepID: "0",
-        MaxDigits: "1",
-        MaxSeconds: "5",
-        MaxSilence: "5",
-        MaxRepeats: "0",
-        ValidDigits: null,
-        TermDigits: "#",
-        NextStepOnSuccess: "2",
-        NextStepOnFailure: "1000",
-      },
-      {
-        StepID: "39442",
-        AppID: "1010",
-        StepNumber: "999",
-        StepType: "100",
-        StepName: "End",
-        WebStepID: "0",
-        MaxDigits: "1",
-        MaxSeconds: "5",
-        MaxSilence: "5",
-        MaxRepeats: "0",
-        ValidDigits: null,
-        TermDigits: "#",
-        NextStepOnSuccess: "1000",
-        NextStepOnFailure: "1000",
-      },
-      {
-        StepID: "39443",
-        AppID: "1010",
-        StepNumber: "2",
-        StepType: "102",
-        StepName: "Step1",
-        WebStepID: "0",
-        MaxDigits: "1",
-        MaxSeconds: "5",
-        MaxSilence: "5",
-        MaxRepeats: "0",
-        ValidDigits: null,
-        TermDigits: "#",
-        NextStepOnSuccess: "999",
-        NextStepOnFailure: "1000",
-      },
-    ];
+    const loadData = await this._loadData();
 
     if (loadData) {
-      console.log("===> result ", loadData);
       await this._onLoadData(loadData);
     } else {
       this._generateStartAndEnd(true);
@@ -660,7 +609,7 @@ class MyJointJS extends React.Component {
   }
 
   async _onLoadData(data) {
-    const datalist = data;
+    const datalist = JSON.parse(data);
 
     const screenWidth = this.paper.getComputedSize().width;
     const screenHeight = this.paper.getComputedSize().height;
@@ -827,7 +776,7 @@ class MyJointJS extends React.Component {
               target: { id: targetElement.id, port: "in" },
               attrs: {
                 line: {
-                  stroke: "green",
+                  stroke: "black",
                   "stroke-width": 2,
                 },
               },
@@ -871,7 +820,7 @@ class MyJointJS extends React.Component {
               target: { id: targetElement.id, port: "in" },
               attrs: {
                 line: {
-                  stroke: "red",
+                  stroke: "black",
                   "stroke-width": 2,
                 },
               },
