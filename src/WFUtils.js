@@ -59,10 +59,24 @@ function getConditions(wf) {
   return content.switch;
 }
 
+function getStepNumber(wf) {
+  if (!wf) {
+    throw new Error("No wf parameter");
+  }
+
+  const stepName = Object.keys(wf)[0];
+  const stepType = Object.keys(wf[stepName])[0];
+
+  const params = wf[stepName][stepType];
+
+  return params.StepNumber ? params.StepNumber : 0;
+}
+
 export default {
   getStepName,
   getStepContent,
   getStepType,
   getConditions,
   setStepName,
+  getStepNumber,
 };

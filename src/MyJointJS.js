@@ -271,9 +271,10 @@ class MyJointJS extends React.Component {
 
   _addStep(flag) {
     let stepName = `Step${this.stepCount}`;
-    let stepCount = this.stepCount;
 
     this.stepCount++;
+
+    let stepCount = this.stepCount;
 
     let rect = new WFRect({
       ports: portsDef,
@@ -352,10 +353,61 @@ class MyJointJS extends React.Component {
   }
 
   async _generateFlowData() {
-    const loadData = await this._loadData();
+    // const loadData = await this._loadData();
+    const loadData = [
+      {
+        StepID: "39441",
+        AppID: "1010",
+        StepNumber: "1",
+        StepType: "100",
+        StepName: "Start",
+        WebStepID: "0",
+        MaxDigits: "1",
+        MaxSeconds: "5",
+        MaxSilence: "5",
+        MaxRepeats: "0",
+        ValidDigits: null,
+        TermDigits: "#",
+        NextStepOnSuccess: "2",
+        NextStepOnFailure: "1000",
+      },
+      {
+        StepID: "39442",
+        AppID: "1010",
+        StepNumber: "999",
+        StepType: "100",
+        StepName: "End",
+        WebStepID: "0",
+        MaxDigits: "1",
+        MaxSeconds: "5",
+        MaxSilence: "5",
+        MaxRepeats: "0",
+        ValidDigits: null,
+        TermDigits: "#",
+        NextStepOnSuccess: "1000",
+        NextStepOnFailure: "1000",
+      },
+      {
+        StepID: "39443",
+        AppID: "1010",
+        StepNumber: "2",
+        StepType: "102",
+        StepName: "Step1",
+        WebStepID: "0",
+        MaxDigits: "1",
+        MaxSeconds: "5",
+        MaxSilence: "5",
+        MaxRepeats: "0",
+        ValidDigits: null,
+        TermDigits: "#",
+        NextStepOnSuccess: "999",
+        NextStepOnFailure: "1000",
+      },
+    ];
+
     if (loadData) {
       console.log("===> result ", loadData);
-      this._onLoadData(loadData);
+      await this._onLoadData(loadData);
     } else {
       this._generateStartAndEnd(true);
       this._generateStartAndEnd(false);
@@ -395,7 +447,7 @@ class MyJointJS extends React.Component {
     rect.set("wf", {
       [stepName]: {
         "100step": {
-          StepNumber: start ? 0 : 999,
+          StepNumber: start ? 1 : 999,
           NextStepOnSuccess: "1000",
           NextStepOnFailure: "1000",
         },
@@ -607,12 +659,17 @@ class MyJointJS extends React.Component {
     this.graph.removeCells(allCells);
   }
 
-  _onLoadData(data) {
-    const datalist = JSON.parse(data);
+  async _onLoadData(data) {
+    const datalist = data;
+
+    const screenWidth = this.paper.getComputedSize().width;
+    const screenHeight = this.paper.getComputedSize().height;
+
+    const centerPos = screenWidth / 2 - WFShape_Width / 2;
 
     const jsondata = { cells: [] };
 
-    jsondata.cells = datalist.map((data) => {
+    jsondata.cells = await datalist.map((data, index) => {
       const validKeys = ["PositionX", "PositionY", "StepName", "StepType"];
       const params = {};
 
@@ -625,8 +682,8 @@ class MyJointJS extends React.Component {
       const cellData = {
         type: "workflow.Rectangle",
         position: {
-          x: data.PositionX ? data.PositionX : 620,
-          y: data.PositionY ? data.PositionY : 340,
+          x: data.PositionX ? data.PositionX : centerPos + 30 * index,
+          y: data.PositionY ? data.PositionY : 30,
         },
         size: { width: 140, height: 70 },
         angle: 0,
@@ -690,7 +747,6 @@ class MyJointJS extends React.Component {
             },
           ],
         },
-        id: "3f38226d-0698-421c-b3c5-e2af57f754cc",
         z: 3,
         wf: {
           [data.StepName]: {
@@ -738,6 +794,99 @@ class MyJointJS extends React.Component {
 
     try {
       this.graph.fromJSON(jsondata);
+
+      // Second pass: Create links
+      await datalist.forEach((data) => {
+        const sourceElement = this._getElementFromStepName(data.StepName);
+        if (!sourceElement) return;
+
+        // Create success link
+        if (
+          data.NextStepOnSuccess &&
+          data.NextStepOnSuccess !== "1000" &&
+          data.NextStepOnSuccess !== "1"
+        ) {
+          const targetElement = this._getElementFromStepNumber(
+            data.NextStepOnSuccess
+          );
+          const targetNumber = WFUtils.getStepNumber(
+            targetElement.attributes.wf
+          );
+
+          const sourcePosition = sourceElement.position();
+          const newPositionY =
+            targetNumber !== "999"
+              ? parseFloat(targetNumber) *
+                ((screenHeight - 200) / datalist.length)
+              : screenHeight - 100;
+          const newPositionX = sourcePosition.x - 100;
+
+          if (targetElement) {
+            const link = new joint.shapes.standard.Link({
+              source: { id: sourceElement.id, port: "out-succ" },
+              target: { id: targetElement.id, port: "in" },
+              attrs: {
+                line: {
+                  stroke: "green",
+                  "stroke-width": 2,
+                },
+              },
+            });
+            this.graph.addCell(link);
+
+            // Set the position of the target element
+            const targetPosition = {
+              x: newPositionX,
+              y: newPositionY,
+            };
+
+            targetElement.position(targetPosition.x, targetPosition.y);
+          }
+        }
+
+        // Create failure link
+        if (
+          data.NextStepOnFailure &&
+          data.NextStepOnFailure !== "1000" &&
+          data.NextStepOnFailure !== "1"
+        ) {
+          const targetElement = this._getElementFromStepNumber(
+            data.NextStepOnFailure
+          );
+          const targetNumber = WFUtils.getStepNumber(
+            targetElement.attributes.wf
+          );
+
+          const sourcePosition = sourceElement.position();
+          const newPositionY =
+            targetNumber !== "999"
+              ? parseFloat(targetNumber) *
+                ((screenHeight - 200) / datalist.length)
+              : screenHeight - 100;
+          const newPositionX = sourcePosition.x + 100;
+
+          if (targetElement) {
+            const link = new joint.shapes.standard.Link({
+              source: { id: sourceElement.id, port: "out-fail" },
+              target: { id: targetElement.id, port: "in" },
+              attrs: {
+                line: {
+                  stroke: "red",
+                  "stroke-width": 2,
+                },
+              },
+            });
+            this.graph.addCell(link);
+
+            // Set the position of the target element
+            const targetPosition = {
+              x: newPositionX,
+              y: newPositionY,
+            };
+            targetElement.position(targetPosition.x, targetPosition.y);
+          }
+        }
+      });
     } catch (error) {
       console.error("Error loading graph from JSON: ", error);
     }
@@ -750,6 +899,20 @@ class MyJointJS extends React.Component {
         return false;
       }
       if (WFUtils.getStepName(wf) === stepName) {
+        return true;
+      }
+      return false;
+    });
+    return foundElement;
+  }
+
+  _getElementFromStepNumber(stepNumber) {
+    const foundElement = this.graph.getElements().find((element) => {
+      const wf = element.get("wf");
+      if (!wf) {
+        return false;
+      }
+      if (WFUtils.getStepNumber(wf) === stepNumber) {
         return true;
       }
       return false;
