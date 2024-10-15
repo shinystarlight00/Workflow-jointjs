@@ -250,7 +250,7 @@ class MyJointJS extends React.Component {
 
     if (loadData) {
       console.log("===> result ", loadData);
-      // this._onLoadData(loadData);
+      this._onLoadData(loadData);
     } else {
       this._generateStartAndEnd(true);
       this._generateStartAndEnd(false);
@@ -433,7 +433,7 @@ class MyJointJS extends React.Component {
   _saveData() {
     const graphData = this.graph.toJSON();
 
-    console.log("=========>data ", graphData);
+    console.log("=========>data ", JSON.stringify(graphData));
 
     const formData = new FormData();
     formData.append("appID", this.props.appID);
@@ -599,14 +599,96 @@ class MyJointJS extends React.Component {
   }
 
   _onLoadData(data) {
-    const wfdata = JSON.parse(data).json_data;
+    const datalist = JSON.parse(data);
 
-    const jsondata = JSON.parse(wfdata);
+    const jsondata = { cells: [] };
 
-    jsondata.cells.forEach((cell) => {
-      // Ensure that rectangles have the correct markup field
-      if (cell.type === "workflow.Rectangle" && !cell.markup) {
-        cell.attrs = {
+    jsondata.cells = datalist.map((data) => {
+      const validKeys = ["PositionX", "PositionY", "StepName", "StepType"];
+      const params = {};
+
+      Object.keys(data).forEach((key) => {
+        if (!validKeys.includes(key)) {
+          params[key] = data[key];
+        }
+      });
+
+      const cellData = {
+        type: "workflow.Rectangle",
+        position: {
+          x: data.PositionX ? data.PositionX : 620,
+          y: data.PositionY ? data.PositionY : 340,
+        },
+        size: { width: 140, height: 70 },
+        angle: 0,
+        ports: {
+          groups: {
+            in: {
+              position: "top",
+              attrs: {
+                circle: {
+                  fill: "#4fa8d1",
+                  stroke: "black",
+                  "stroke-width": 1,
+                  r: 8,
+                  magnet: "passive",
+                },
+              },
+            },
+            out: {
+              position: "bottom",
+              attrs: {
+                circle: {
+                  fill: "#daf2dc",
+                  stroke: "black",
+                  "stroke-width": 1,
+                  r: 8,
+                  magnet: true,
+                },
+              },
+            },
+            "out-condition": {
+              position: "bottom",
+              attrs: {
+                circle: {
+                  fill: "#daf2dc",
+                  stroke: "black",
+                  "stroke-width": 1,
+                  r: 8,
+                  magnet: true,
+                },
+                text: { fill: "#6a6c8a", fontSize: 14 },
+              },
+              label: {
+                position: {
+                  name: "outsideOriented",
+                  args: { offset: 15, attrs: {} },
+                },
+              },
+            },
+          },
+          items: [
+            { id: "in", group: "in" },
+            {
+              id: "out-succ",
+              group: "out",
+              attrs: { circle: { fill: "#00FF00" } },
+            },
+            {
+              id: "out-fail",
+              group: "out",
+              attrs: { circle: { fill: "#FFC0CB" } },
+            },
+          ],
+        },
+        id: "3f38226d-0698-421c-b3c5-e2af57f754cc",
+        z: 3,
+        wf: {
+          [data.StepName]: {
+            [data.StepType + "step"]: params,
+          },
+        },
+        attrs: {
           body: {
             refWidth: "100%",
             refHeight: "100%",
@@ -621,10 +703,10 @@ class MyJointJS extends React.Component {
             refY: "50%",
             fontSize: 14,
             fill: "black",
-            text: cell.attrs.label.text,
+            text: data.StepName,
           },
-        };
-        cell.markup = [
+        },
+        markup: [
           {
             tagName: "rect",
             selector: "body",
@@ -637,8 +719,10 @@ class MyJointJS extends React.Component {
             tagName: "text",
             selector: "icon",
           },
-        ];
-      }
+        ],
+      };
+
+      return cellData;
     });
 
     this._deleteAll();
