@@ -749,6 +749,39 @@ class MyJointJS extends React.Component {
         const sourceElement = this._getElementFromStepName(data.StepName);
         if (!sourceElement) return;
 
+        /**
+         * Add a handler for the context menu.
+         */
+        this.paper
+          .findViewByModel(sourceElement)
+          .on("element:contextmenu", (e) => {
+            if (e.preventDefault) {
+              e.preventDefault();
+            } else {
+              e.returnValue = false; // For older browsers
+            }
+
+            this.setState({
+              contextShowMenu: true,
+              mouse: { x: e.clientX, y: e.clientY },
+              menuElement: sourceElement,
+              wf: clone(sourceElement.get("wf")),
+            });
+          });
+
+        /*
+         * Add a handler for the settings menu on a double click.
+         */
+        this.paper
+          .findViewByModel(sourceElement)
+          .on("element:pointerdblclick", (e) => {
+            this.setState({
+              settingsShowDialog: true,
+              menuElement: sourceElement,
+              wf: clone(sourceElement.get("wf")),
+            });
+          });
+
         // Create success link
         if (
           data.NextStepOnSuccess &&
