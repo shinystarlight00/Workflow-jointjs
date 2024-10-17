@@ -635,8 +635,10 @@ class MyJointJS extends React.Component {
       const cellData = {
         type: "workflow.Rectangle",
         position: {
-          x: data.PositionX ? data.PositionX : centerPos + 30 * index,
-          y: data.PositionY ? data.PositionY : 30,
+          x: data.PositionX
+            ? parseFloat(data.PositionX)
+            : centerPos + 30 * index,
+          y: data.PositionY ? parseFloat(data.PositionY) : 30,
         },
         size: { width: 140, height: 70 },
         angle: 0,
@@ -815,7 +817,7 @@ class MyJointJS extends React.Component {
                 positionData.StepNumber == parseInt(data.NextStepOnSuccess)
             );
 
-            if (nextStep && !nextStep.PositionX && !nextStep.PositionY) {
+            if (nextStep && (!nextStep.PositionX || !nextStep.PositionY)) {
               const sourcePosition = sourceElement.position();
               const newPositionY =
                 targetNumber !== "999"
@@ -864,7 +866,7 @@ class MyJointJS extends React.Component {
                 positionData.StepNumber == parseInt(data.NextStepOnFailure)
             );
 
-            if (nextStep && !nextStep.PositionX && !nextStep.PositionY) {
+            if (nextStep && (!nextStep.PositionX || !nextStep.PositionY)) {
               const sourcePosition = sourceElement.position();
               const newPositionY =
                 targetNumber !== "999"
