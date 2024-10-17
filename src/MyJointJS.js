@@ -302,7 +302,7 @@ class MyJointJS extends React.Component {
   } // _setDirection
 
   _add(flag) {
-    this._addStep(flag);
+    return this._addStep(flag);
   } // _add
 
   _addStep(flag) {
@@ -537,9 +537,67 @@ class MyJointJS extends React.Component {
     //newElement.set('wf', clone(this.state.menuElement.get('wf')))
     const newWf = clone(this.state.menuElement.get("wf"));
     WFUtils.setStepName(newWf, "Copy_" + WFUtils.getStepName(newWf));
+    WFUtils.setStepNumber(newWf, this.stepCount);
     this._setElementFromWF(newElement, newWf);
+    this._generateLinks(newWf);
     this._menuClose();
   } // _duplicateElement
+
+  _generateLinks(wf) {
+    const stepName = WFUtils.getStepName(wf);
+    const stepType = WFUtils.getStepType(wf);
+    const data = wf[stepName][stepType];
+    const sourceElement = this._getElementFromStepNumber(data.StepNumber);
+    // Create success link
+    if (
+      data.NextStepOnSuccess &&
+      data.NextStepOnSuccess !== "1000" &&
+      data.NextStepOnSuccess !== "1"
+    ) {
+      const targetElement = this._getElementFromStepNumber(
+        data.NextStepOnSuccess
+      );
+
+      if (targetElement) {
+        const link = new joint.shapes.standard.Link({
+          source: { id: sourceElement.id, port: "out-succ" },
+          target: { id: targetElement.id, port: "in" },
+          attrs: {
+            line: {
+              stroke: "black",
+              "stroke-width": 2,
+            },
+          },
+        });
+        this.graph.addCell(link);
+      }
+    }
+
+    // Create failure link
+    if (
+      data.NextStepOnFailure &&
+      data.NextStepOnFailure !== "1000" &&
+      data.NextStepOnFailure !== "1"
+    ) {
+      const targetElement = this._getElementFromStepNumber(
+        data.NextStepOnFailure
+      );
+
+      if (targetElement) {
+        const link = new joint.shapes.standard.Link({
+          source: { id: sourceElement.id, port: "out-fail" },
+          target: { id: targetElement.id, port: "in" },
+          attrs: {
+            line: {
+              stroke: "black",
+              "stroke-width": 2,
+            },
+          },
+        });
+        this.graph.addCell(link);
+      }
+    }
+  }
 
   _setElementFromWF(jjsElement, wf) {
     let type = WFUtils.getStepType(wf);
@@ -632,11 +690,6 @@ class MyJointJS extends React.Component {
     this.setState({ settingsShowDialog: false });
     this._menuClose();
   } // _settingsCancel
-
-  _dumpElement() {
-    console.dir(this.state.menuElement.get("wf"));
-    console.dir(this.state.menuElement);
-  } // _dumpElement
 
   _deleteAll() {
     // Delete all elements
@@ -788,7 +841,7 @@ class MyJointJS extends React.Component {
 
       // Second pass: Create links
       await datalist.forEach((data) => {
-        const sourceElement = this._getElementFromStepName(data.StepName);
+        const sourceElement = this._getElementFromStepNumber(data.StepNumber);
         if (!sourceElement) return;
 
         /**
@@ -1006,8 +1059,6 @@ class MyJointJS extends React.Component {
             Duplicate
           </MenuItem>
           <MenuItem onClick={() => this._deleteElement()}>Delete</MenuItem>
-
-          <MenuItem onClick={this._dumpElement.bind(this)}>Dump</MenuItem>
         </Menu>
 
         {/* SETTINGS */}

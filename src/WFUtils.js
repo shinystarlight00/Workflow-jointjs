@@ -23,6 +23,19 @@ function setStepName(wf, newName) {
   wf[newName] = content;
 }
 
+function setStepNumber(wf, newNumber) {
+  if (!wf) {
+    throw new Error("No wf parameter");
+  }
+  if (!newNumber) {
+    throw new Error("no newNumber");
+  }
+  const stepName = getStepName(wf);
+  const stepType = getStepType(wf);
+
+  wf[stepName][stepType].StepNumber = newNumber;
+}
+
 function getStepContent(wf) {
   if (!wf) {
     throw new Error("No wf parameter");
@@ -73,4 +86,5 @@ export default {
   getConditions,
   setStepName,
   getStepNumber,
+  setStepNumber,
 };
