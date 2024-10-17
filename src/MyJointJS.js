@@ -224,14 +224,50 @@ class MyJointJS extends React.Component {
 
     this.paper.on("link:pointerup", function (linkView) {
       if (linkView.hasTools()) return;
+
+      const removeCallback = () => {
+        const sourceElement = linkView.model.getSourceElement();
+        const sourcePort = linkView.model.source().port;
+
+        if (sourceElement) {
+          const wf = sourceElement.get("wf");
+          const stepName = WFUtils.getStepName(wf);
+          const stepType = WFUtils.getStepType(wf);
+          const stepParams = wf[stepName][stepType];
+
+          const param =
+            sourcePort === "out-succ"
+              ? "NextStepOnSuccess"
+              : "NextStepOnFailure";
+
+          // Reset the next step to '1000' (or your default value)
+          wf[stepName][stepType] = {
+            ...stepParams,
+            [param]: "1000",
+          };
+
+          // Update the element's wf attribute
+          sourceElement.set("wf", wf);
+        }
+      };
+
       linkView.addTools(
         new joint.dia.ToolsView({
           tools: [
-            new joint.linkTools.Remove({ distance: WFShape_RemoveDistance }),
+            new joint.linkTools.Remove({
+              distance: WFShape_RemoveDistance,
+              action: function (evt, linkView, toolView) {
+                // Call the custom remove callback
+                removeCallback();
+                // Then remove the link
+                linkView.model.remove();
+              },
+            }),
           ],
         })
       );
     });
+
     this.paper.on("link:mouseenter", function (linkView) {
       linkView.showTools();
     });
