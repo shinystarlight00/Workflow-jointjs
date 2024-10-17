@@ -393,7 +393,137 @@ class MyJointJS extends React.Component {
   }
 
   async _generateFlowData() {
-    const loadData = await this._loadData();
+    // const loadData = await this._loadData();
+    const loadData = [
+      {
+        StepID: "39430",
+        AppID: "1010",
+        StepNumber: "999",
+        StepType: "999",
+        StepName: "EndCall",
+        WebStepID: "0",
+        MaxDigits: "1",
+        MaxSeconds: "5",
+        MaxSilence: "5",
+        MaxRepeats: "0",
+        ValidDigits: null,
+        TermDigits: "#",
+        NextStepOnSuccess: "1",
+        NextStepOnFailure: "1",
+      },
+      {
+        StepID: "39431",
+        AppID: "1010",
+        StepNumber: "1",
+        StepType: "105",
+        StepName: "DID-DNIS Lookup",
+        WebStepID: "0",
+        MaxDigits: "1",
+        MaxSeconds: "5",
+        MaxSilence: "5",
+        MaxRepeats: "0",
+        ValidDigits: "",
+        TermDigits: "#",
+        NextStepOnSuccess: "2",
+        NextStepOnFailure: "999",
+      },
+      {
+        StepID: "39432",
+        AppID: "1010",
+        StepNumber: "2",
+        StepType: "301",
+        StepName: "GetExtension",
+        WebStepID: "0",
+        MaxDigits: "4",
+        MaxSeconds: "14",
+        MaxSilence: "5",
+        MaxRepeats: "3",
+        ValidDigits: "",
+        TermDigits: "#",
+        NextStepOnSuccess: "3",
+        NextStepOnFailure: "5",
+      },
+      {
+        StepID: "39433",
+        AppID: "1010",
+        StepNumber: "3",
+        StepType: "400",
+        StepName: "RecordName",
+        WebStepID: "3",
+        MaxDigits: "1",
+        MaxSeconds: "19",
+        MaxSilence: "3",
+        MaxRepeats: "0",
+        ValidDigits: "",
+        TermDigits: "#",
+        NextStepOnSuccess: "4",
+        NextStepOnFailure: "5",
+      },
+      {
+        StepID: "39434",
+        AppID: "1010",
+        StepNumber: "4",
+        StepType: "550",
+        StepName: "TransferCall",
+        WebStepID: "5",
+        MaxDigits: "1",
+        MaxSeconds: "13800",
+        MaxSilence: "5",
+        MaxRepeats: "0",
+        ValidDigits: "",
+        TermDigits: "#",
+        NextStepOnSuccess: "999",
+        NextStepOnFailure: "6",
+      },
+      {
+        StepID: "39435",
+        AppID: "1010",
+        StepNumber: "5",
+        StepType: "200",
+        StepName: "None Available",
+        WebStepID: "0",
+        MaxDigits: "1",
+        MaxSeconds: "5",
+        MaxSilence: "0",
+        MaxRepeats: "0",
+        ValidDigits: "",
+        TermDigits: "#",
+        NextStepOnSuccess: "999",
+        NextStepOnFailure: "999",
+      },
+      {
+        StepID: "39436",
+        AppID: "1010",
+        StepNumber: "6",
+        StepType: "400",
+        StepName: "LeaveMessage",
+        WebStepID: "0",
+        MaxDigits: "1",
+        MaxSeconds: "45",
+        MaxSilence: "5",
+        MaxRepeats: "0",
+        ValidDigits: "",
+        TermDigits: "#",
+        NextStepOnSuccess: "999",
+        NextStepOnFailure: "999",
+      },
+      {
+        StepID: "39437",
+        AppID: "1010",
+        StepNumber: "7",
+        StepType: "300",
+        StepName: "Junk123",
+        WebStepID: "1",
+        MaxDigits: "1",
+        MaxSeconds: "5",
+        MaxSilence: "5",
+        MaxRepeats: "0",
+        ValidDigits: "12345",
+        TermDigits: "#",
+        NextStepOnSuccess: "999",
+        NextStepOnFailure: "999",
+      },
+    ];
 
     if (loadData) {
       await this._onLoadData(loadData);
@@ -570,7 +700,7 @@ class MyJointJS extends React.Component {
   } // _deleteElement
 
   _duplicateElement() {
-    const newElement = this._add(false);
+    const newElement = this._addStep(false);
     //newElement.set('wf', clone(this.state.menuElement.get('wf')))
     const newWf = clone(this.state.menuElement.get("wf"));
     WFUtils.setStepName(newWf, "Copy_" + WFUtils.getStepName(newWf));
@@ -735,7 +865,8 @@ class MyJointJS extends React.Component {
   }
 
   async _onLoadData(data) {
-    const datalist = JSON.parse(data);
+    // const datalist = JSON.parse(data);
+    const datalist = data;
 
     const screenWidth = this.paper.getComputedSize().width;
     const screenHeight = this.paper.getComputedSize().height;
