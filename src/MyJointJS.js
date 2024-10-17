@@ -5,6 +5,8 @@ import React from "react";
 import Button from "@material-ui/core/Button";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
+import Alert from "@material-ui/lab/Alert";
+import Collapse from "@material-ui/core/Collapse";
 
 import Grid from "@material-ui/core/Grid";
 import SettingsDialog from "./SettingsDialog.js";
@@ -118,8 +120,10 @@ class MyJointJS extends React.Component {
     super(props);
     this.graph = new joint.dia.Graph({}, { cellNamespace: joint.shapes });
     this.state = {
+      initialGraph: null,
       openLoad: false,
       openSave: false,
+      saveStatus: false,
       saveText: "",
       loadText: "",
       settingsShowDialog: false, // Set to true to show the settings dialog.
@@ -302,7 +306,7 @@ class MyJointJS extends React.Component {
   } // _setDirection
 
   _add(flag) {
-    return this._addStep(flag);
+    this._addStep(flag);
   } // _add
 
   _addStep(flag) {
@@ -473,27 +477,60 @@ class MyJointJS extends React.Component {
   _saveData() {
     const graphData = this.graph.toJSON();
 
-    console.log("=========>data ", JSON.stringify(graphData));
+    if (this._validation(graphData)) {
+      const formData = new FormData();
+      formData.append("appID", this.props.appID);
+      formData.append("data", JSON.stringify(graphData));
 
-    const formData = new FormData();
-    formData.append("appID", this.props.appID);
-    formData.append("data", JSON.stringify(graphData));
-
-    fetch("http://localhost:8050/dtgreen/SysAdmin/AddStep2.php", {
-      method: "POST",
-      body: formData,
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.status == "Success") {
-          alert("Workflow data saved successfully!");
-        } else {
-          alert("Error! ", data.error);
-        }
+      fetch("http://localhost:8050/dtgreen/SysAdmin/AddStep2.php", {
+        method: "POST",
+        body: formData,
       })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.status == "Success") {
+            alert("Workflow data saved successfully!");
+          } else {
+            alert("Error! ", data.error);
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+    } else {
+      alert(
+        "All steps must have connection to next step (both success & failure)!"
+      );
+    }
+  }
+
+  _validation(graphData) {
+    const cells = graphData.cells;
+
+    const results = cells.find((cell) => {
+      if (cell.type == "workflow.Rectangle") {
+        const wf = cell.wf;
+        const stepName = WFUtils.getStepName(wf);
+        const stepType = WFUtils.getStepType(wf);
+        const data = wf[stepName][stepType];
+        const stepNumber = parseInt(data.StepNumber);
+
+        if (stepNumber !== 999) {
+          if (stepNumber == 1) {
+            if (data.NextStepOnSuccess === "1000") return true;
+          } else {
+            if (
+              data.NextStepOnSuccess === "1000" ||
+              data.NextStepOnFailure === "1000"
+            )
+              return true;
+          }
+        }
+      }
+    });
+
+    if (results) return false;
+    else return true;
   }
 
   async _loadData() {
@@ -710,9 +747,10 @@ class MyJointJS extends React.Component {
     jsondata.cells = await datalist.map((data, index) => {
       const validKeys = ["PositionX", "PositionY", "StepName", "StepType"];
       const params = {};
+      const stepNumber = parseInt(data.StepNumber);
 
-      if (data.StepNumber > this.stepCount) {
-        this.stepCount = data.StepNumber + 1;
+      if (stepNumber > this.stepCount && stepNumber !== 999) {
+        this.stepCount = stepNumber + 1;
       }
 
       Object.keys(data).forEach((key) => {
@@ -974,6 +1012,10 @@ class MyJointJS extends React.Component {
           }
         }
       });
+
+      const graphData = JSON.stringify(this.graph.toJSON());
+
+      this.setState({ initialGraph: graphData });
     } catch (error) {
       console.error("Error loading graph from JSON: ", error);
     }
@@ -1007,34 +1049,55 @@ class MyJointJS extends React.Component {
     return foundElement;
   }
 
+  _checkChange() {
+    const graphData = JSON.stringify(this.graph.toJSON());
+
+    if (graphData != this.state.initialGraph)
+      this.setState({ saveStatus: true });
+  }
+
   render() {
+    setInterval(() => {
+      this._checkChange();
+    }, 1000);
+
     return (
       <div>
         {/* This is the anchor element for the JointJS surface */}
         <div ref={(el) => (this.el = el)}></div>
 
         {/* Button at the bottom */}
-        <Grid container justifyContent="flex-end">
-          <Button
-            color="primary"
-            variant="contained"
-            onClick={() => {
-              this._saveData();
-            }}
-            style={{ marginRight: 20 }}
-          >
-            Save
-          </Button>
-          <Button
-            color="primary"
-            variant="contained"
-            onClick={() => {
-              this._add(true);
-            }}
-            style={{ marginRight: 20 }}
-          >
-            Add Step
-          </Button>
+        <Grid container justifyContent="space-between">
+          <Grid>
+            <Collapse in={this.state.saveStatus} style={{ marginLeft: 20 }}>
+              <Alert variant="filled" severity="warning">
+                Please save progress before you left!
+              </Alert>
+            </Collapse>
+          </Grid>
+          <Grid>
+            <Button
+              color="primary"
+              variant="contained"
+              onClick={() => {
+                this._saveData();
+              }}
+              disabled={!this.state.saveStatus}
+              style={{ marginRight: 20 }}
+            >
+              Save
+            </Button>
+            <Button
+              color="primary"
+              variant="contained"
+              onClick={() => {
+                this._add(true);
+              }}
+              style={{ marginRight: 20 }}
+            >
+              Add Step
+            </Button>
+          </Grid>
         </Grid>
 
         {/* Context Menu from step */}
