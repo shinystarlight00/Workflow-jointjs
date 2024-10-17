@@ -622,6 +622,10 @@ class MyJointJS extends React.Component {
       const validKeys = ["PositionX", "PositionY", "StepName", "StepType"];
       const params = {};
 
+      if (data.StepNumber > this.stepCount) {
+        this.stepCount = data.StepNumber + 1;
+      }
+
       Object.keys(data).forEach((key) => {
         if (!validKeys.includes(key)) {
           params[key] = data[key];
