@@ -795,17 +795,7 @@ class MyJointJS extends React.Component {
           const targetElement = this._getElementFromStepNumber(
             data.NextStepOnSuccess
           );
-          const targetNumber = WFUtils.getStepNumber(
-            targetElement.attributes.wf
-          );
-
-          const sourcePosition = sourceElement.position();
-          const newPositionY =
-            targetNumber !== "999"
-              ? parseFloat(targetNumber) *
-                ((screenHeight - 200) / datalist.length)
-              : screenHeight - 100;
-          const newPositionX = sourcePosition.x - 100;
+          const targetNumber = data.NextStepOnSuccess;
 
           if (targetElement) {
             const link = new joint.shapes.standard.Link({
@@ -820,13 +810,28 @@ class MyJointJS extends React.Component {
             });
             this.graph.addCell(link);
 
-            // Set the position of the target element
-            const targetPosition = {
-              x: newPositionX,
-              y: newPositionY,
-            };
+            const nextStep = datalist.find(
+              (positionData) =>
+                positionData.StepNumber == parseInt(data.NextStepOnSuccess)
+            );
 
-            targetElement.position(targetPosition.x, targetPosition.y);
+            if (nextStep && !nextStep.PositionX && !nextStep.PositionY) {
+              const sourcePosition = sourceElement.position();
+              const newPositionY =
+                targetNumber !== "999"
+                  ? parseFloat(targetNumber) *
+                    ((screenHeight - 200) / datalist.length)
+                  : screenHeight - 100;
+              const newPositionX = sourcePosition.x - 100;
+
+              // Set the position of the target element
+              const targetPosition = {
+                x: newPositionX,
+                y: newPositionY,
+              };
+
+              targetElement.position(targetPosition.x, targetPosition.y);
+            }
           }
         }
 
@@ -839,17 +844,7 @@ class MyJointJS extends React.Component {
           const targetElement = this._getElementFromStepNumber(
             data.NextStepOnFailure
           );
-          const targetNumber = WFUtils.getStepNumber(
-            targetElement.attributes.wf
-          );
-
-          const sourcePosition = sourceElement.position();
-          const newPositionY =
-            targetNumber !== "999"
-              ? parseFloat(targetNumber) *
-                ((screenHeight - 200) / datalist.length)
-              : screenHeight - 100;
-          const newPositionX = sourcePosition.x + 100;
+          const targetNumber = data.NextStepOnFailure;
 
           if (targetElement) {
             const link = new joint.shapes.standard.Link({
@@ -864,12 +859,27 @@ class MyJointJS extends React.Component {
             });
             this.graph.addCell(link);
 
-            // Set the position of the target element
-            const targetPosition = {
-              x: newPositionX,
-              y: newPositionY,
-            };
-            targetElement.position(targetPosition.x, targetPosition.y);
+            const nextStep = datalist.find(
+              (positionData) =>
+                positionData.StepNumber == parseInt(data.NextStepOnFailure)
+            );
+
+            if (nextStep && !nextStep.PositionX && !nextStep.PositionY) {
+              const sourcePosition = sourceElement.position();
+              const newPositionY =
+                targetNumber !== "999"
+                  ? parseFloat(targetNumber) *
+                    ((screenHeight - 200) / datalist.length)
+                  : screenHeight - 100;
+              const newPositionX = sourcePosition.x + 100;
+
+              // Set the position of the target element
+              const targetPosition = {
+                x: newPositionX,
+                y: newPositionY,
+              };
+              targetElement.position(targetPosition.x, targetPosition.y);
+            }
           }
         }
       });
